@@ -1,0 +1,119 @@
+.scope-selector {
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 12px;
+  background: #fff;
+}
+
+.scope-header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.scope-label {
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.scope-count {
+  font-size: 12px;
+  color: #4b5563;
+}
+
+.scope-max-row {
+  margin-top: 8px;
+  display: grid;
+  grid-template-columns: 1fr 80px;
+  gap: 10px;
+  align-items: center;
+}
+
+.scope-sub-count {
+  margin-top: 8px;
+  font-size: 12px;
+  color: #374151;
+}
+
+.scope-tab-row {
+  margin-top: 10px;
+  display: flex;
+  gap: 8px;
+}
+
+.scope-tab-row button {
+  border: 1px solid #d1d5db;
+  background: #f9fafb;
+  border-radius: 999px;
+  padding: 6px 10px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.scope-tab-row button.active {
+  background: #111827;
+  color: #fff;
+  border-color: #111827;
+}
+
+.scope-all-check {
+  margin-top: 10px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.scope-info,
+.scope-error {
+  margin-top: 10px;
+  font-size: 13px;
+}
+
+.scope-error {
+  color: #b91c1c;
+}
+
+.scope-groups {
+  margin-top: 10px;
+  max-height: 360px;
+  overflow: auto;
+  display: grid;
+  gap: 8px;
+}
+
+.scope-group {
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  padding: 8px;
+}
+
+.scope-group-head {
+  display: inline-flex;
+  gap: 6px;
+  align-items: center;
+  font-weight: 800;
+  font-size: 13px;
+}
+
+.scope-group-count {
+  color: #6b7280;
+  font-weight: 600;
+}
+
+.scope-question-list {
+  margin-top: 8px;
+  display: grid;
+  gap: 6px;
+  padding-left: 8px;
+}
+
+.scope-question-item {
+  display: grid;
+  grid-template-columns: 16px 1fr;
+  gap: 8px;
+  align-items: start;
+  font-size: 13px;
+  color: #111827;
+}

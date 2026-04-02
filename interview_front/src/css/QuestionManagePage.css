@@ -1,0 +1,190 @@
+.qm-page {
+  min-height: 100vh;
+  background: #f5f6f8;
+  padding: 20px;
+}
+
+.qm-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.qm-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.qm-actions button,
+.qm-primary {
+  border: none;
+  border-radius: 10px;
+  padding: 10px 14px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.qm-primary {
+  background: #2563eb;
+  color: #fff;
+}
+
+.qm-error {
+  margin-top: 12px;
+  color: #b91c1c;
+}
+
+.qm-loading {
+  margin-top: 16px;
+}
+
+.qm-empty {
+  margin-top: 16px;
+  padding: 20px;
+  border: 1px dashed #d1d5db;
+  border-radius: 12px;
+  background: #fff;
+  color: #6b7280;
+}
+
+.qm-list {
+  margin-top: 16px;
+  display: grid;
+  gap: 10px;
+}
+
+.qm-row {
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 14px;
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.qm-title {
+  font-weight: 700;
+}
+
+.qm-meta {
+  margin-top: 4px;
+  font-size: 13px;
+  color: #6b7280;
+}
+
+.qm-row-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.qm-row-actions button {
+  border: none;
+  border-radius: 8px;
+  padding: 8px 10px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.qm-answer-edit {
+  background: #16a34a;
+  color: #fff;
+}
+
+.qm-answer-register {
+  background: #f59e0b;
+  color: #111827;
+}
+
+.qm-delete {
+  background: #ef4444;
+  color: #fff;
+}
+
+.qm-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  display: grid;
+  place-items: center;
+  padding: 16px;
+}
+
+.qm-modal {
+  width: 100%;
+  max-width: 560px;
+  background: #fff;
+  border-radius: 12px;
+  padding: 18px;
+}
+
+.qm-modal form {
+  display: grid;
+  gap: 8px;
+}
+
+.qm-modal input,
+.qm-modal select,
+.qm-modal textarea {
+  width: 100%;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  padding: 10px;
+  box-sizing: border-box;
+}
+
+.qm-answer-textarea {
+  resize: none;
+}
+
+.qm-editor-tabs {
+  display: inline-flex;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  overflow: hidden;
+  width: fit-content;
+}
+
+.qm-editor-tabs button {
+  border: none;
+  background: #f9fafb;
+  padding: 8px 12px;
+  cursor: pointer;
+  font-weight: 700;
+}
+
+.qm-editor-tabs button.active {
+  background: #2563eb;
+  color: #fff;
+}
+
+.qm-preview-box,
+.qm-preview-empty {
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  background: #fafafa;
+  min-height: 120px;
+  max-height: 220px;
+  overflow: auto;
+  padding: 12px;
+}
+
+.qm-preview-empty {
+  color: #6b7280;
+}
+
+.qm-modal-buttons {
+  margin-top: 10px;
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.qm-modal-buttons button {
+  border: none;
+  border-radius: 8px;
+  padding: 8px 12px;
+  font-weight: 700;
+  cursor: pointer;
+}

@@ -1,0 +1,62 @@
+.single-range-page {
+  min-height: 100vh;
+  background: #f5f6f8;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+}
+
+.single-range-card {
+  width: 100%;
+  max-width: 720px;
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 16px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+  padding: 24px;
+}
+
+.single-range-card h1 {
+  margin: 0;
+  font-size: 24px;
+}
+
+.single-range-card p {
+  margin-top: 10px;
+  color: #4b5563;
+}
+
+.single-range-placeholder {
+  margin-top: 16px;
+  border: 1px dashed #9ca3af;
+  border-radius: 12px;
+  padding: 16px;
+  display: grid;
+  gap: 10px;
+  color: #374151;
+  background: #f9fafb;
+}
+
+.single-range-actions {
+  margin-top: 18px;
+  display: flex;
+  gap: 10px;
+}
+
+.single-range-actions button {
+  height: 42px;
+  padding: 0 14px;
+  border-radius: 10px;
+  border: none;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.single-range-actions button:first-child {
+  background: #e5e7eb;
+}
+
+.single-range-actions button:last-child {
+  background: #2563eb;
+  color: #fff;
+}

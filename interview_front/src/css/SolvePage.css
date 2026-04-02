@@ -1,0 +1,212 @@
+.solve-page {
+  min-height: 100vh;
+  background: #f5f6f8;
+}
+
+.solve-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px;
+  border-bottom: 1px solid #E5E7EB;
+  background: white;
+}
+
+.solve-title {
+  font-size: 20px;
+  font-weight: 800;
+}
+
+.solve-sub {
+  font-size: 13px;
+  color: #4B5563;
+  margin-top: 6px;
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.solve-sub2 {
+  font-size: 12px;
+  color: #6B7280;
+  margin-top: 6px;
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+
+.solve-dot {
+  margin: 0 4px;
+}
+
+.solve-status {
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.solve-header-btn {
+  height: 34px;
+  padding: 0 10px;
+  border-radius: 10px;
+  border: 1px solid #E5E7EB;
+  background: white;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 800;
+  transition: background-color 0.2s;
+}
+
+.solve-header-btn:hover {
+  background: #F9FAFB;
+}
+
+.solve-main {
+  padding: 16px;
+  display: grid;
+  place-items: start center;
+}
+
+.solve-card {
+  width: 100%;
+  max-width: 720px;
+  background: white;
+  border-radius: 14px;
+  border: 1px solid #E5E7EB;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.06);
+  overflow: hidden;
+  padding: 16px;
+}
+
+.solve-section {
+  margin-bottom: 16px;
+}
+
+.solve-label {
+  font-size: 12px;
+  font-weight: 800;
+  color: #6B7280;
+  margin-bottom: 8px;
+}
+
+.solve-big-text {
+  font-size: 18px;
+  font-weight: 900;
+  color: #111827;
+}
+
+.solve-question-box {
+  padding: 12px;
+  border-radius: 12px;
+  background: #F9FAFB;
+  border: 1px solid #E5E7EB;
+  white-space: pre-wrap;
+  line-height: 1.5;
+}
+
+.solve-answer-btn {
+  height: 38px;
+  border-radius: 10px;
+  border: 1px solid #E5E7EB;
+  background: white;
+  padding: 0 12px;
+  font-weight: 800;
+  transition: all 0.2s;
+}
+
+.solve-tab-bar {
+  margin-top: 10px;
+  display: flex;
+  gap: 8px;
+}
+
+.solve-tab {
+  height: 34px;
+  padding: 0 12px;
+  border-radius: 999px;
+  border: 1px solid #E5E7EB;
+  background: #F9FAFB;
+  color: #374151;
+  font-weight: 900;
+  cursor: pointer;
+  font-size: 13px;
+  transition: all 0.2s;
+}
+
+/* 탭 활성화 상태 (클래스 추가로 처리) */
+.solve-tab.active {
+  background: white;
+  border: 1px solid #111827;
+  color: #111827;
+}
+
+.solve-answer-edit-btn {
+  height: 34px;
+  padding: 0 12px;
+  border-radius: 999px;
+  border: 1px solid #2563EB;
+  background: #2563EB;
+  color: white;
+  font-weight: 900;
+  cursor: pointer;
+  font-size: 13px;
+}
+
+.solve-answer-editor {
+  width: 100%;
+  min-height: 180px;
+  border: 1px solid #D1D5DB;
+  border-radius: 10px;
+  padding: 10px;
+  font-size: 14px;
+  line-height: 1.5;
+  resize: vertical;
+  box-sizing: border-box;
+}
+
+.solve-answer-box {
+  margin-top: 10px;
+  padding: 12px;
+  border-radius: 12px;
+  background: white;
+  border: 1px solid #E5E7EB;
+  color: #111827;
+  line-height: 1.6;
+  overflow-x: auto;
+}
+
+.solve-raw-text {
+  white-space: pre-wrap;
+  line-height: 1.6;
+}
+
+.solve-hint {
+  font-size: 12px;
+  color: #6B7280;
+  margin-top: 8px;
+}
+
+.solve-divider {
+  height: 1px;
+  background: #E5E7EB;
+  margin: 16px 0;
+}
+
+.solve-nav-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.solve-nav-btn {
+  flex: 1;
+  height: 44px;
+  border-radius: 12px;
+  border: none;
+  background: #111827;
+  color: white;
+  font-weight: 900;
+  font-size: 14px;
+  transition: all 0.2s;
+}
