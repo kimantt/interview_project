@@ -1,0 +1,29 @@
+services:
+  backend:
+    image: asia-northeast3-docker.pkg.dev/PROJECT_ID/interview-repo/interview-backend:latest
+    container_name: interview-backend
+    restart: always
+    environment:
+      SPRING_DATASOURCE_URL: ${SPRING_DATASOURCE_URL}
+      SPRING_DATASOURCE_USERNAME: ${SPRING_DATASOURCE_USERNAME}
+      SPRING_DATASOURCE_PASSWORD: ${SPRING_DATASOURCE_PASSWORD}
+      SPRING_DATA_REDIS_HOST: redis
+      SPRING_DATA_REDIS_PORT: 6379
+    expose:
+      - "8080"
+    depends_on:
+      - redis
+
+  frontend:
+    image: asia-northeast3-docker.pkg.dev/PROJECT_ID/interview-repo/interview-frontend:latest
+    container_name: interview-frontend
+    restart: always
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+
+  redis:
+    image: redis:7-alpine
+    container_name: interview-redis
+    restart: always
