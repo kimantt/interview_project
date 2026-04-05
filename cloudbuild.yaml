@@ -93,7 +93,7 @@ substitutions:
   _REGION: "asia-northeast3"
   _REPO: "interview-repo"
   _VM_NAME: "minecraft-server"
-  _ZONE: "asia-northeast3-a"
+  _ZONE: "asia-northeast3-b"
   _DEPLOY_DIR: "/home/ee212551/interview_project"
 
 serviceAccount: "projects/project-77badbd5-1dbd-43b7-996/serviceAccounts/cloud-build-deploy@project-77badbd5-1dbd-43b7-996.iam.gserviceaccount.com"
