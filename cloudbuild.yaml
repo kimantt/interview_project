@@ -1,0 +1,102 @@
+steps:
+  # 1) Backend image build
+  - id: "build-backend"
+    name: "gcr.io/cloud-builders/docker"
+    args:
+      [
+        "build",
+        "-t",
+        "${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPO}/interview-backend:latest",
+        "-t",
+        "${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPO}/interview-backend:${SHORT_SHA}",
+        "./interview"
+      ]
+
+  # 2) Frontend image build
+  - id: "build-frontend"
+    name: "gcr.io/cloud-builders/docker"
+    args:
+      [
+        "build",
+        "-t",
+        "${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPO}/interview-frontend:latest",
+        "-t",
+        "${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPO}/interview-frontend:${SHORT_SHA}",
+        "./interview_front"
+      ]
+
+  # 3) Push backend images
+  - id: "push-backend-latest"
+    name: "gcr.io/cloud-builders/docker"
+    args:
+      [
+        "push",
+        "${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPO}/interview-backend:latest"
+      ]
+
+  - id: "push-backend-sha"
+    name: "gcr.io/cloud-builders/docker"
+    args:
+      [
+        "push",
+        "${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPO}/interview-backend:${SHORT_SHA}"
+      ]
+
+  # 4) Push frontend images
+  - id: "push-frontend-latest"
+    name: "gcr.io/cloud-builders/docker"
+    args:
+      [
+        "push",
+        "${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPO}/interview-frontend:latest"
+      ]
+
+  - id: "push-frontend-sha"
+    name: "gcr.io/cloud-builders/docker"
+    args:
+      [
+        "push",
+        "${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPO}/interview-frontend:${SHORT_SHA}"
+      ]
+
+  # 5) Deploy on VM
+  - id: "deploy-to-vm"
+    name: "gcr.io/cloud-builders/gcloud"
+    entrypoint: "bash"
+    args:
+      - "-c"
+      - |
+        set -e
+
+        gcloud compute ssh ${_VM_NAME} \
+          --zone=${_ZONE} \
+          --project=${PROJECT_ID} \
+          --command="
+            set -e
+            cd ${_DEPLOY_DIR}
+
+            gcloud auth configure-docker ${_REGION}-docker.pkg.dev --quiet
+
+            docker compose pull
+            docker compose up -d
+
+            docker image prune -f
+          "
+
+images:
+  - "${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPO}/interview-backend:latest"
+  - "${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPO}/interview-backend:${SHORT_SHA}"
+  - "${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPO}/interview-frontend:latest"
+  - "${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPO}/interview-frontend:${SHORT_SHA}"
+
+substitutions:
+  _REGION: "asia-northeast3"
+  _REPO: "interview-repo"
+  _VM_NAME: "minecraft-server"
+  _ZONE: "asia-northeast3-a"
+  _DEPLOY_DIR: "/home/ee212551/interview_project"
+
+serviceAccount: "projects/project-77badbd5-1dbd-43b7-996/serviceAccounts/cloud-build-deploy@project-77badbd5-1dbd-43b7-996.iam.gserviceaccount.com"
+
+options:
+  logging: CLOUD_LOGGING_ONLY
