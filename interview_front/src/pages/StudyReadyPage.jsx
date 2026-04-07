@@ -44,7 +44,8 @@ export default function StudyReadyPage() {
   // START 브로드캐스트 수신 시 전원 이동
   useEffect(() => {
     if (startSignal) {
-      navigate("/solve");
+      sessionStorage.setItem("solveMode", "multi");
+      navigate("/solve", { state: { mode: "multi" } });
     }
   }, [startSignal, navigate]);
 

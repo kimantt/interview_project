@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 
 import com.cs_study.interview.dto.SolveStateDto;
 import com.cs_study.interview.repository.QuestionRepository;
+import com.cs_study.interview.store.SingleSolveStore;
 import com.cs_study.interview.store.SolveRoomStore;
 import com.cs_study.interview.store.StudyPresenceStore;
 import com.cs_study.interview.store.StudyPresenceStore.ParticipantState;
@@ -19,11 +20,18 @@ public class SolveService {
     private final QuestionRepository questionRepository;
     private final SolveRoomStore roomStore;
     private final StudyPresenceStore presenceStore;
+    private final SingleSolveStore singleSolveStore;
 
-    public SolveService(QuestionRepository questionRepository, SolveRoomStore roomStore, StudyPresenceStore presenceStore) {
+    public SolveService(
+            QuestionRepository questionRepository,
+            SolveRoomStore roomStore,
+            StudyPresenceStore presenceStore,
+            SingleSolveStore singleSolveStore
+    ) {
         this.questionRepository = questionRepository;
         this.roomStore = roomStore;
         this.presenceStore = presenceStore;
+        this.singleSolveStore = singleSolveStore;
     }
 
     // 문제풀이 시작 시: 문제 리스트 구성 + 풀이자 순서 초기화
@@ -116,5 +124,48 @@ public class SolveService {
 
     public void prev() {
         roomStore.prev();
+    }
+    
+    public void configureSingleScope(long userId, List<Long> scopedIds) {
+        singleSolveStore.configureScope(userId, scopedIds);
+    }
+
+    public void loadSingleQuestionsIfEmpty(long userId) {
+        if (!singleSolveStore.getQuestions(userId).isEmpty()) return;
+        List<Long> scopedIds = singleSolveStore.getSelectedQuestionIds(userId);
+        var list = buildQuestionList(scopedIds, false);
+        singleSolveStore.setQuestions(userId, list);
+    }
+
+    public SolveStateDto currentSingleState(long userId, String username) {
+        List<String> questions = singleSolveStore.getQuestions(userId);
+        int total = questions.size();
+        int qi = singleSolveStore.getQuestionIndex(userId);
+        String question = (total == 0) ? "" : questions.get(qi);
+        return new SolveStateDto(qi, total, question, userId, username);
+    }
+
+    public SolveStateDto nextSingle(long userId, String username) {
+        loadSingleQuestionsIfEmpty(userId);
+        singleSolveStore.next(userId);
+        return currentSingleState(userId, username);
+    }
+
+    public SolveStateDto prevSingle(long userId, String username) {
+        loadSingleQuestionsIfEmpty(userId);
+        singleSolveStore.prev(userId);
+        return currentSingleState(userId, username);
+    }
+
+    private ArrayList<String> buildQuestionList(List<Long> scopedIds, boolean shuffleQuestions) {
+        if (scopedIds == null || scopedIds.isEmpty()) {
+            return new ArrayList<>();
+        }
+
+        var list = new ArrayList<>(questionRepository.findQuestionsByIdsOrdered(scopedIds));
+        if (shuffleQuestions && list.size() >= 2) {
+            Collections.shuffle(list);
+        }
+        return list;
     }
 }

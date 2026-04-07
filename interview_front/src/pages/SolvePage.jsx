@@ -1,8 +1,14 @@
 import { useEffect, useMemo, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../auth/AuthContext";
 import { useStomp } from "../ws/StompContext";
-import { fetchMyAnswer, upsertMyAnswer } from "../api/solve";
+import {
+  fetchMyAnswer,
+  fetchSingleSolveState,
+  nextSingleSolve,
+  prevSingleSolve,
+  upsertMyAnswer,
+} from "../api/solve";
 import "../css/SolvePage.css";
 
 // 마크다운 렌더러
@@ -13,7 +19,10 @@ import remarkBreaks from "remark-breaks";
 // 문제풀이 진행 화면: 상태 동기화 + 내 답안 조회/수정
 export default function SolvePage() {
   const navigate = useNavigate();
+  const location = useLocation();
   const { user } = useAuth();
+  const playMode = location.state?.mode || sessionStorage.getItem("solveMode") || "multi";
+  const isSingleMode = playMode === "single";
 
   const {
     status,
@@ -36,21 +45,47 @@ export default function SolvePage() {
   const [answerTab, setAnswerTab] = useState("MARKDOWN");
   const [isEditingAnswer, setIsEditingAnswer] = useState(false);
   const [answerDraft, setAnswerDraft] = useState("");
+  const [singleSolveState, setSingleSolveState] = useState(null);
 
   // 1) SolvePage 진입 시 STOMP 연결 보장
   useEffect(() => {
+    if (isSingleMode) return;
     if (status === "DISCONNECTED") {
       connectAndEnter(user.userId);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [status, user.userId]);
+  }, [isSingleMode, status, user.userId]);
 
   // 2) CONNECTED 되면 sync 발행
   useEffect(() => {
+    if (isSingleMode) return;
     if (status === "CONNECTED") {
       sendSolveSync();
     }
-  }, [status, sendSolveSync]);
+  }, [isSingleMode, status, sendSolveSync]);
+
+  // 2-b) 싱글플레이면 REST 상태 동기화
+  useEffect(() => {
+    if (!isSingleMode) return;
+
+    let alive = true;
+    const syncSingle = async () => {
+      try {
+        const state = await fetchSingleSolveState();
+        if (alive) {
+          setSingleSolveState(state);
+          clearStartSignal?.();
+        }
+      } catch (e) {
+        console.error("single solve sync failed:", e);
+      }
+    };
+
+    syncSingle();
+    return () => {
+      alive = false;
+    };
+  }, [clearStartSignal, isSingleMode]);
 
   // 문제/인덱스 바뀌면 내 정답 보기 상태는 로컬에서만 초기화
   useEffect(() => {
@@ -63,10 +98,12 @@ export default function SolvePage() {
     setAnswerTab("MARKDOWN");
     setIsEditingAnswer(false);
     setAnswerDraft("");
-  }, [solveState?.questionIndex, solveState?.question]);
+  }, [isSingleMode, singleSolveState?.questionIndex, singleSolveState?.question, solveState?.questionIndex, solveState?.question]);
 
-  const total = solveState?.totalQuestions ?? 0;
-  const idx = solveState?.questionIndex ?? 0;
+  const currentSolveState = isSingleMode ? singleSolveState : solveState;
+
+  const total = currentSolveState?.totalQuestions ?? 0;
+  const idx = currentSolveState?.questionIndex ?? 0;
 
   const hasQuestions = total > 0;
   const isLastQuestion = hasQuestions && idx === total - 1;
@@ -74,32 +111,50 @@ export default function SolvePage() {
 
   // 현재 문제 푸는 사람만 이전/다음 가능(턴 기반)
   const isMyTurn =
-    solveState && String(solveState.solverUserId) === String(user.userId);
+    isSingleMode ||
+    (currentSolveState &&
+      String(currentSolveState.solverUserId) === String(user.userId));
 
   const progressText = useMemo(() => {
-    if (!solveState || !solveState.totalQuestions) return "0 / 0";
-    return `${solveState.questionIndex + 1} / ${solveState.totalQuestions}`;
-  }, [solveState]);
+    if (!currentSolveState || !currentSolveState.totalQuestions) return "0 / 0";
+    return `${currentSolveState.questionIndex + 1} / ${currentSolveState.totalQuestions}`;
+  }, [currentSolveState]);
 
   const onPrev = () => {
-    if (status !== "CONNECTED") return;
     if (!isMyTurn) return;
+    if (isSingleMode) {
+      prevSingleSolve()
+        .then((state) => {
+          setSingleSolveState(state);
+        })
+        .catch(() => {});
+      return;
+    }
+    if (status !== "CONNECTED") return;
     sendSolvePrev();
   };
 
   const onNext = () => {
-    if (status !== "CONNECTED") return;
     if (!isMyTurn) return;
 
     // 마지막 문제에서는 더 이상 넘어가지 않음
     if (isLastQuestion) return;
-
+    
+    if (isSingleMode) {
+      nextSingleSolve()
+        .then((state) => {
+          setSingleSolveState(state);
+        })
+        .catch(() => {});
+      return;
+    }
+    if (status !== "CONNECTED") return;
     sendSolveNext();
   };
 
   // 답안 보기/숨기기 및 최초 조회
   const onToggleAnswer = async () => {
-    if (!solveState?.question) return;
+    if (!currentSolveState?.question) return;
 
     if (answerVisible) {
       setAnswerVisible(false);
@@ -111,7 +166,7 @@ export default function SolvePage() {
       setLoadingAnswer(true);
       setAnswerError("");
       try {
-        const data = await fetchMyAnswer(solveState.question);
+        const data = await fetchMyAnswer(currentSolveState.question);
         setMyAnswer(data?.answer ?? "");
       } catch (e) {
         setAnswerError("정답을 불러오지 못했습니다.");
@@ -131,12 +186,12 @@ export default function SolvePage() {
 
   // 답안 등록/수정 완료 시 서버에 저장
   const onSubmitAnswer = async () => {
-    if (!solveState?.question) return;
+    if (!currentSolveState?.question) return;
 
     setSavingAnswer(true);
     setAnswerError("");
     try {
-      await upsertMyAnswer(solveState.question, answerDraft);
+      await upsertMyAnswer(currentSolveState.question, answerDraft);
       setMyAnswer(answerDraft);
       setIsEditingAnswer(false);
     } catch (e) {
@@ -154,12 +209,13 @@ export default function SolvePage() {
     try {
       clearStartSignal?.();
     } catch (_) {}
+    sessionStorage.removeItem("solveMode");
 
     navigate("/");
   };
 
   // 로딩/미동기화 상태 처리
-  if (!solveState) {
+  if (!currentSolveState) {
     return (
       <div className="solve-page">
         <header className="solve-header">
@@ -180,7 +236,9 @@ export default function SolvePage() {
               <div className="solve-label">상태</div>
               <div className="solve-question-box">문제 상태를 불러오는 중...</div>
               <div className="solve-hint">
-                CONNECTED가 되면 자동으로 /app/solve/sync를 발행합니다.
+                {isSingleMode
+                  ? "싱글플레이 상태를 불러오고 있습니다."
+                  : "CONNECTED가 되면 자동으로 /app/solve/sync를 발행합니다."}
               </div>
             </div>
           </section>
@@ -225,10 +283,10 @@ export default function SolvePage() {
             <>
               <div className="solve-section">
                 <div className="solve-label">현재 문제 푸는 사람</div>
-                <div className="solve-big-text">{solveState.solverUsername || "-"}</div>
+                <div className="solve-big-text">{currentSolveState.solverUsername || "-"}</div>
                 {!isMyTurn && (
                   <div className="solve-hint">
-                    지금은 <b>{solveState.solverUsername || "다른 사용자"}</b>님의 차례입니다.
+                    지금은 <b>{currentSolveState.solverUsername || "다른 사용자"}</b>님의 차례입니다.
                   </div>
                 )}
               </div>
@@ -236,7 +294,7 @@ export default function SolvePage() {
               <div className="solve-section">
                 <div className="solve-label">문제</div>
                 <div className="solve-question-box">
-                  {solveState.question ? solveState.question : "문제가 없습니다."}
+                  {currentSolveState.question ? currentSolveState.question : "문제가 없습니다."}
                 </div>
               </div>
 
@@ -246,10 +304,10 @@ export default function SolvePage() {
                 <button
                   className="solve-answer-btn"
                   style={{
-                    opacity: status === "CONNECTED" ? 1 : 0.5,
-                    cursor: status === "CONNECTED" ? "pointer" : "not-allowed",
+                    opacity: isSingleMode || status === "CONNECTED" ? 1 : 0.5,
+                    cursor: isSingleMode || status === "CONNECTED" ? "pointer" : "not-allowed",
                   }}
-                  disabled={status !== "CONNECTED" || !solveState.question}
+                  disabled={(!isSingleMode && status !== "CONNECTED") || !currentSolveState.question}
                   onClick={onToggleAnswer}
                 >
                   {answerVisible ? "답안 숨기기" : "답안 보기"}
@@ -334,13 +392,20 @@ export default function SolvePage() {
                   className="solve-nav-btn"
                   style={{
                     opacity:
-                      status === "CONNECTED" && isMyTurn && !isFirstQuestion ? 1 : 0.5,
+                      (isSingleMode || status === "CONNECTED") && isMyTurn && !isFirstQuestion
+                        ? 1
+                        : 0.5,
                     cursor:
-                      status === "CONNECTED" && isMyTurn && !isFirstQuestion
+                      (isSingleMode || status === "CONNECTED") && isMyTurn && !isFirstQuestion
                         ? "pointer"
                         : "not-allowed",
                   }}
-                  disabled={status !== "CONNECTED" || !isMyTurn || total === 0 || isFirstQuestion}
+                  disabled={
+                    (!isSingleMode && status !== "CONNECTED") ||
+                    !isMyTurn ||
+                    total === 0 ||
+                    isFirstQuestion
+                  }
                   onClick={onPrev}
                   title={
                     isFirstQuestion
@@ -356,14 +421,20 @@ export default function SolvePage() {
                 <button
                   className="solve-nav-btn"
                   style={{
-                    opacity: status === "CONNECTED" && isMyTurn && !isLastQuestion ? 1 : 0.5,
+                    opacity:
+                      (isSingleMode || status === "CONNECTED") && isMyTurn && !isLastQuestion
+                        ? 1
+                        : 0.5,
                     cursor:
-                      status === "CONNECTED" && isMyTurn && !isLastQuestion
+                      (isSingleMode || status === "CONNECTED") && isMyTurn && !isLastQuestion
                         ? "pointer"
                         : "not-allowed",
                   }}
                   disabled={
-                    status !== "CONNECTED" || !isMyTurn || total === 0 || isLastQuestion
+                    (!isSingleMode && status !== "CONNECTED") ||
+                    !isMyTurn ||
+                    total === 0 ||
+                    isLastQuestion
                   }
                   onClick={onNext}
                   title={

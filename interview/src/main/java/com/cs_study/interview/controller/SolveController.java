@@ -18,6 +18,7 @@ import com.cs_study.interview.dto.MyAnswerResponse;
 import com.cs_study.interview.dto.SolveAnswerUpdateRequest;
 import com.cs_study.interview.dto.SolveEventDto;
 import com.cs_study.interview.dto.SolveScopeRequest;
+import com.cs_study.interview.dto.SolveStateDto;
 import com.cs_study.interview.entity.AnswerEntity;
 import com.cs_study.interview.repository.AnswerRepository;
 import com.cs_study.interview.repository.QuestionRepository;
@@ -132,6 +133,45 @@ public class SolveController {
         return ResponseEntity.noContent().build();
     }
     
+    @PostMapping("/single/scope")
+    public ResponseEntity<?> configureSingleScope(@RequestBody SolveScopeRequest req, HttpSession session) {
+        long userId = currentUserId(session);
+
+        var ids = (req == null || req.questionIds() == null)
+                ? java.util.List.<Long>of()
+                : req.questionIds().stream().filter(id -> id != null && id > 0).distinct().toList();
+
+        if (ids.isEmpty()) {
+            throw new IllegalArgumentException("문제 범위를 먼저 선택해주세요.");
+        }
+
+        solveService.configureSingleScope(userId, ids);
+        solveService.loadSingleQuestionsIfEmpty(userId);
+        return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/single/state")
+    public ResponseEntity<SolveStateDto> singleState(HttpSession session) {
+        long userId = currentUserId(session);
+        String username = currentUsername(session);
+        solveService.loadSingleQuestionsIfEmpty(userId);
+        return ResponseEntity.ok(solveService.currentSingleState(userId, username));
+    }
+
+    @PostMapping("/single/next")
+    public ResponseEntity<SolveStateDto> singleNext(HttpSession session) {
+        long userId = currentUserId(session);
+        String username = currentUsername(session);
+        return ResponseEntity.ok(solveService.nextSingle(userId, username));
+    }
+
+    @PostMapping("/single/prev")
+    public ResponseEntity<SolveStateDto> singlePrev(HttpSession session) {
+        long userId = currentUserId(session);
+        String username = currentUsername(session);
+        return ResponseEntity.ok(solveService.prevSingle(userId, username));
+    }
+    
     // 현재 로그인 사용자의 답안을 생성/수정(upsert)
     @PostMapping("/my-answer")
     public ResponseEntity<?> upsertMyAnswer(@RequestBody SolveAnswerUpdateRequest req, HttpSession session) {
@@ -161,6 +201,14 @@ public class SolveController {
             throw new IllegalArgumentException("로그인이 필요합니다.");
         }
         return n.longValue();
+    }
+    
+    private String currentUsername(HttpSession session) {
+        Object usernameObj = session.getAttribute("USERNAME");
+        if (usernameObj == null) {
+            throw new IllegalArgumentException("로그인이 필요합니다.");
+        }
+        return String.valueOf(usernameObj);
     }
 
     private String normalize(String value, int maxLength, String fieldName) {

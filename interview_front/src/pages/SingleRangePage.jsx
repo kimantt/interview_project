@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import QuestionScopeSelector from "../components/QuestionScopeSelector";
-import { configureSolveScope } from "../api/solve";
+import { configureSingleSolveScope } from "../api/solve";
 import "../css/SingleRangePage.css";
 
 // 싱글플레이 시작 전 문제 범위를 선택하는 화면
@@ -14,8 +14,9 @@ export default function SingleRangePage() {
   const onStart = async () => {
     setSubmitting(true);
     try {
-      await configureSolveScope(scope.finalSelectedIds || []);
-      navigate("/solve");
+      await configureSingleSolveScope(scope.finalSelectedIds || []);
+      sessionStorage.setItem("solveMode", "single");
+      navigate("/solve", { state: { mode: "single" } });
     } catch (e) {
       alert(e?.response?.data?.message || "문제 범위를 적용하지 못했습니다.");
     } finally {

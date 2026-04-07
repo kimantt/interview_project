@@ -14,3 +14,25 @@ export async function upsertMyAnswer(question, answer) {
 export async function configureSolveScope(questionIds) {
   await axiosInstance.post("/solve/scope", { questionIds });
 }
+
+// 싱글플레이 전용 범위 설정
+export async function configureSingleSolveScope(questionIds) {
+  await axiosInstance.post("/solve/single/scope", { questionIds });
+}
+
+// 싱글플레이 현재 상태 조회
+export async function fetchSingleSolveState() {
+  const res = await axiosInstance.get("/solve/single/state");
+  return res.data;
+}
+
+// 싱글플레이 다음/이전 이동
+export async function nextSingleSolve() {
+  const res = await axiosInstance.post("/solve/single/next");
+  return res.data;
+}
+
+export async function prevSingleSolve() {
+  const res = await axiosInstance.post("/solve/single/prev");
+  return res.data;
+}
