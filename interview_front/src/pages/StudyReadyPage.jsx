@@ -6,6 +6,7 @@ import "../css/StudyReadyPage.css";
 import { configureSolveScope } from "../api/solve";
 import QuestionScopeSelector from "../components/QuestionScopeSelector";
 
+// 멀티플레이 준비방: 참가자/준비/시작 + 문제범위 설정
 export default function StudyReadyPage() {
   const navigate = useNavigate();
   const { user, logout } = useAuth();
@@ -68,6 +69,7 @@ export default function StudyReadyPage() {
   const allReady =
     participantsArr.length > 0 && participantsArr.every((p) => !!p.ready);
 
+  // 호스트 시작 시 범위를 먼저 서버에 적용한 뒤 START 발행
   const onMainButtonClick = async () => {
     if (isHost && allReady) {
       try {

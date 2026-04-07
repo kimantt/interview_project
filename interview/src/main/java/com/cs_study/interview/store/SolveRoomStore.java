@@ -5,6 +5,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import org.springframework.stereotype.Component;
 
+// 서버 메모리 기반의 문제풀이 room 상태 저장소
 @Component
 public class SolveRoomStore {
 

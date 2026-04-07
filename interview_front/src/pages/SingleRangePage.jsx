@@ -4,11 +4,13 @@ import QuestionScopeSelector from "../components/QuestionScopeSelector";
 import { configureSolveScope } from "../api/solve";
 import "../css/SingleRangePage.css";
 
+// 싱글플레이 시작 전 문제 범위를 선택하는 화면
 export default function SingleRangePage() {
   const navigate = useNavigate();
   const [scope, setScope] = useState({ finalSelectedIds: [] });
   const [submitting, setSubmitting] = useState(false);
 
+  // 선택 범위를 서버에 적용하고 문제풀이 화면으로 이동
   const onStart = async () => {
     setSubmitting(true);
     try {

@@ -11,6 +11,7 @@ function shuffle(array) {
   return arr;
 }
 
+// 문제 범위 선택(최대 수/탭/체크/랜덤 보충) 공통 컴포넌트
 export default function QuestionScopeSelector({ compact = false, onSelectionChange }) {
   const [questions, setQuestions] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -103,6 +104,7 @@ export default function QuestionScopeSelector({ compact = false, onSelectionChan
     });
   }, [onSelectionChange, clampedMaxCount, selectedIds, finalSelectedIds]);
 
+  // 개별 문제 체크/해제 (최대 개수 초과 방지)
   const toggleQuestion = (questionId) => {
     setSelectedIds((prev) => {
       const next = new Set(prev);
@@ -119,6 +121,7 @@ export default function QuestionScopeSelector({ compact = false, onSelectionChan
     });
   };
 
+  // 그룹 체크/해제 (그룹 단위 전체 선택)
   const toggleGroup = (groupQuestions) => {
     const ids = groupQuestions.map((q) => q.questionId);
     const allChecked = ids.every((id) => selectedIds.has(id));
@@ -141,6 +144,7 @@ export default function QuestionScopeSelector({ compact = false, onSelectionChan
     });
   };
 
+  // 전체 체크/해제 (필요 시 최대 문제 수 자동 확장)
   const toggleAll = () => {
     const allIds = questions.map((q) => q.questionId);
     const isAllChecked = allIds.length > 0 && allIds.every((id) => selectedIds.has(id));

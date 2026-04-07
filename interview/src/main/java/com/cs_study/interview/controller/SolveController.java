@@ -27,6 +27,7 @@ import com.cs_study.interview.store.SolveRoomStore;
 
 import jakarta.servlet.http.HttpSession;
 
+//문제풀이 실시간(STOMP) + 개인 답안/범위(REST) 엔드포인트
 @RestController
 @RequestMapping("/api/solve")
 public class SolveController {
@@ -54,7 +55,7 @@ public class SolveController {
         this.messaging = messaging;
     }
     
-    // 페이지 진입 시 클라가 한번 호출: /app/solve/sync
+    // 현재 room 상태를 구독자들에게 동기화할 때 사용
     @MessageMapping("/solve/sync")
     public void sync(Message<byte[]> message) {
         solveService.loadQuestionsIfEmpty();
@@ -114,6 +115,7 @@ public class SolveController {
         return ResponseEntity.ok(new MyAnswerResponse(question, e.getAnswer()));
     }
     
+    // 문제풀이 시작 전에 사용할 문제 범위를 서버 메모리에 저장
     @PostMapping("/scope")
     public ResponseEntity<?> configureScope(@RequestBody SolveScopeRequest req) {
     	var ids = (req == null || req.questionIds() == null)
@@ -130,6 +132,7 @@ public class SolveController {
         return ResponseEntity.noContent().build();
     }
     
+    // 현재 로그인 사용자의 답안을 생성/수정(upsert)
     @PostMapping("/my-answer")
     public ResponseEntity<?> upsertMyAnswer(@RequestBody SolveAnswerUpdateRequest req, HttpSession session) {
         long userId = currentUserId(session);

@@ -19,6 +19,7 @@ import com.cs_study.interview.service.QuestionManageService;
 
 import jakarta.servlet.http.HttpSession;
 
+//문제/카테고리/개인답변 관리 REST API
 @RestController
 @RequestMapping("/api/questions/manage")
 public class QuestionManageController {

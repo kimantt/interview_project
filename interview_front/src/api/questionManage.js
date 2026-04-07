@@ -1,5 +1,6 @@
 import axiosInstance from "./axiosInstance";
 
+// 문제 관리 화면용 문제 목록 조회
 export async function fetchManageQuestions() {
   const res = await axiosInstance.get("/questions/manage/list");
   return res.data;

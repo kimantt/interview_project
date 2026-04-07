@@ -13,6 +13,7 @@ import {
 } from "../api/questionManage";
 import "../css/QuestionManagePage.css";
 
+// 문제 관리 화면: 문제 추가/수정/삭제 + 내 답안 관리
 export default function QuestionManagePage() {
   const navigate = useNavigate();
   const [questions, setQuestions] = useState([]);
@@ -33,6 +34,7 @@ export default function QuestionManagePage() {
 
   const categoryOptions = useMemo(() => categories ?? [], [categories]);
 
+  // 문제 목록과 카테고리를 동시에 로드
   const loadAll = async () => {
     setLoading(true);
     setError("");

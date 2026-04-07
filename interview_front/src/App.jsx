@@ -10,6 +10,7 @@ import QuestionManagePage from "./pages/QuestionManagePage";
 import { StompProvider } from "./ws/StompContext";
 
 export default function App() {
+  // 인증 상태 기반 페이지 라우팅 진입점
   return (
     <BrowserRouter>
       <AuthProvider>

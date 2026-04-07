@@ -39,7 +39,7 @@ export default function LoginPage() {
   return (
     <div className="login-page">
       <form onSubmit={onSubmit} className="login-card">
-        <h2 className="login-title">자동화 반영</h2>
+        <h2 className="login-title">로그인</h2>
 
         <label className="login-label">아이디</label>
         <input

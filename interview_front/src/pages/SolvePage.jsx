@@ -10,6 +10,7 @@ import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import remarkBreaks from "remark-breaks";
 
+// 문제풀이 진행 화면: 상태 동기화 + 내 답안 조회/수정
 export default function SolvePage() {
   const navigate = useNavigate();
   const { user } = useAuth();
@@ -96,7 +97,7 @@ export default function SolvePage() {
     sendSolveNext();
   };
 
-  // 내 답안 보기(개별 REST)
+  // 답안 보기/숨기기 및 최초 조회
   const onToggleAnswer = async () => {
     if (!solveState?.question) return;
 
@@ -128,6 +129,7 @@ export default function SolvePage() {
     setIsEditingAnswer(true);
   };
 
+  // 답안 등록/수정 완료 시 서버에 저장
   const onSubmitAnswer = async () => {
     if (!solveState?.question) return;
 

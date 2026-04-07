@@ -26,11 +26,7 @@ public class SolveService {
         this.presenceStore = presenceStore;
     }
 
-    /**
-     * 문제풀이 시작 시점 초기화:
-     * - 문제 목록을 새로 로드하고(필요 시 셔플)
-     * - 참가자 턴 순서를 매번 새롭게 셔플해서 고정
-     */
+    // 문제풀이 시작 시: 문제 리스트 구성 + 풀이자 순서 초기화
     public synchronized void initSolveIfNeeded(boolean shuffleQuestions) {
     	// 1) 문제 목록을 매번 새로 구성
     	var list = buildQuestionList(shuffleQuestions);
@@ -68,6 +64,7 @@ public class SolveService {
         roomStore.reset();
     }
 
+    // scope로 선택된 questionId 기준으로 실제 출제용 문제 리스트를 생성
     private ArrayList<String> buildQuestionList(boolean shuffleQuestions) {
         List<Long> scopedIds = roomStore.getSelectedQuestionIds();
         if (scopedIds == null || scopedIds.isEmpty()) {
